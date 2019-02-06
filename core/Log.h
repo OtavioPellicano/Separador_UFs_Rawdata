@@ -35,7 +35,7 @@ private:
 
     bool mProcessamentoOK{true};
 
-    QStringList mCabecalho{"Codigo", "Descricao", "Observacao"};
+    QStringList mCabecalho{"Código", "Descrição", "Observação"};
 
 };
 

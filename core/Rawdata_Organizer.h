@@ -27,7 +27,6 @@ public:
     virtual ~Rawdata_Organizer(){mMapUfMedicoes.clear();}
 
     void processar(const QDir& dirIn, const QDir& dirOut);
-    void processarLista(const QStringList& arqs, const QDir &dirIn, const QDir& dirOut);
 
     void processarMultThread(const QDir& dirIn, const QDir& dirOut);
 
@@ -48,6 +47,8 @@ private:
     void descarregar(std::vector<QStringList> &mapMedicoes, const QDir& dirOut, const QString& fileName, const QStringList &cabecalho);
 
     void addMedicao(const std::unique_ptr<Rawdata> &layout, const QStringList& strCsv, const QDir& dirOut, const QString &fileName, const QStringList &cabecalho);
+
+    void processarLista(const QStringList& arqs, const QDir &dirIn, const QDir& dirOut);
 
 private:
 

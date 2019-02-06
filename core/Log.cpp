@@ -18,19 +18,19 @@ QString Log::descricao(const Log::codigo &cod)
 {
     switch (cod) {
     case codigo::SEM_ERRO:
-        return QString{"Processamento concluido com sucesso"};
+        return QString{"Processamento concluído com sucesso"};
 
     case codigo::PASTA_VAZIA:
         return QString{"Pasta de origem vazia"};
 
     case codigo::LAYOUT_INVALIDO:
-        return QString{"Arquivo ignorado (Layout invalido)"};
+        return QString{"Arquivo ignorado (Layout inválido)"};
 
     case codigo::ERRO_LEITURA:
-        return QString{"Arquivo ignorado (Leitura impossivel)"};
+        return QString{"Arquivo ignorado (Leitura impossível)"};
 
     case codigo::ERRO_ESCRITA:
-        return QString{"Salvamento impossivel"};
+        return QString{"Salvamento impossível"};
 
     default:
         return QString{"ERRO DESCONHECIDO"};
