@@ -9,8 +9,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->pushButton_salvar->setEnabled(false);
 
-
-
 }
 
 MainWindow::~MainWindow()

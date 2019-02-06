@@ -52,3 +52,6 @@ HEADERS += \
 
 FORMS += \
         MainWindow.ui
+
+RESOURCES += \
+    img.qrc
