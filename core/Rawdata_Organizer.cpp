@@ -31,10 +31,9 @@ void Rawdata_Organizer::processarLista(QStringList &arqs, const QDir& dirIn, con
     for(auto& fileName:arqs)
     {
         emit progressoFile(contador);
-        emit progresso(++contador*100/arqs.size());
+        qDebug() << contador << arqs.size() << contador*100/arqs.size();
         processarArquivo(fileName, dirIn, dirOut);
-        arqs.pop_front();
-
+        emit progresso(++contador*100/arqs.size());
     }
 }
 
@@ -82,21 +81,6 @@ void Rawdata_Organizer::processarArquivo(const QString &fileName, const QDir &di
     if(!mMapUfMedicoes.isEmpty())
         descarregar(mMapUfMedicoes, dirOut, fileName, cabecalho);
 
-
-}
-
-void Rawdata_Organizer::processarMultThread(const QDir &dirIn, const QDir &dirOut)
-{
-
-    QStringList arqs{dirIn.entryList(QStringList{"*.csv"})};
-
-    for(auto& fileName:arqs)
-    {
-       QtConcurrent::run(this, &processarArquivo, QString(fileName), QDir(dirIn), QDir(dirOut));
-
-        if(arqs.isEmpty())
-            break;
-    }
 
 }
 

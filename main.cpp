@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     w.setWindowIcon(QIcon(":/img/brazil_64.png"));
     w.setWindowTitle("Separador de UFs");
 
-    w.show();
+    w.showMaximized();
 
     return a.exec();
 }

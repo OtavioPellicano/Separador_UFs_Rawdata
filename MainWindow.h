@@ -6,10 +6,9 @@
 #include <QDir>
 #include <QMessageBox>
 #include <QDebug>
-#include <QTest>
-//#include <QtConcurrent>
 #include <QThread>
 #include "core/Rawdata_Organizer.h"
+#include <QScrollBar>
 
 namespace Ui {
 class MainWindow;

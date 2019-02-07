@@ -7,7 +7,6 @@
 #include "Scm_8.h"
 #include "Scm_9.h"
 #include "Smp_10_11.h"
-//#include "Thread_Guard.h"
 #include "Log.h"
 
 #include <memory>
@@ -18,8 +17,6 @@
 #include <QDebug>
 #include <QHash>
 #include <set>
-#include <QtConcurrent>
-#include <qtconcurrentrun.h>
 #include <QThread>
 #include <QObject>
 
@@ -32,8 +29,6 @@ public:
     virtual ~Rawdata_Organizer(){mMapUfMedicoes.clear();}
 
     void processar(const QDir& dirIn, const QDir& dirOut);
-
-    void processarMultThread(const QDir& dirIn, const QDir& dirOut);
 
     QDir dirIn() const;
     void setDirIn(const QDir &dirIn);

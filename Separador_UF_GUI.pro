@@ -5,7 +5,6 @@
 #-------------------------------------------------
 
 QT       += core gui
-QT += testlib
 QT += concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets

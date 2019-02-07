@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->pushButton_salvar->setEnabled(false);
 
+    ui->tableWidget_listaArquivos->setSelectionBehavior(QAbstractItemView::SelectRows);
+
 }
 
 MainWindow::~MainWindow()
@@ -33,6 +35,8 @@ void MainWindow::carregarListaArquivos(const QDir &dirIn)
         ui->tableWidget_listaArquivos->setItem(i, 0, new QTableWidgetItem(it[0]));
     }
 
+    updateProgressBar(0);
+    ui->statusBar->clearMessage();
 }
 
 void MainWindow::carregarTabelaLog(const QStringList &cabecalho, const std::vector<QStringList> &vecLog)
@@ -96,6 +100,7 @@ void MainWindow::on_pushButton_salvar_clicked()
     rawdata.moveToThread(thread);
 
     connect(&rawdata, SIGNAL(progresso(int)), this, SLOT(updateProgressBar(int)));
+    connect(&rawdata, SIGNAL(progressoFile(int)), this, SLOT(updateProgressoLista(int)));
 
     ui->statusBar->showMessage("Processando...");
     rawdata.processar(dirIn, dirOut);
@@ -110,10 +115,15 @@ void MainWindow::on_pushButton_salvar_clicked()
 
 void MainWindow::updateProgressBar(int value)
 {
+    QCoreApplication::processEvents();
     ui->progressBar->setValue(value);
 }
 
 void MainWindow::updateProgressoLista(int value)
 {
-    ui->tableWidget_listaArquivos->item(value,0)->setSelected(true);
+    if(value != 0)
+        ui->tableWidget_listaArquivos->item(value - 1, 0)->setSelected(false);
+
+    ui->tableWidget_listaArquivos->item(value, 0)->setSelected(true);
+    ui->tableWidget_listaArquivos->verticalScrollBar()->setValue(value);
 }
