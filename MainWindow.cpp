@@ -107,11 +107,4 @@ void MainWindow::on_pushButton_salvar_clicked()
 
     msg.exec();
 
-//    ResumoProcessamento resPros(rawdata.log().cabecalho(), rawdata.log().logs(), this);
-
-//    resPros.exec();
-
-
-    qDebug() << "Salvo";
-
 }
