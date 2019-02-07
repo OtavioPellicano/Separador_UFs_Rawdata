@@ -36,8 +36,11 @@ private slots:
 
     void updateProgressoLista(int value);
 
+
 private:
     Ui::MainWindow *ui;
+
+    QThread* mThread;
 };
 
 #endif // MAINWINDOW_H

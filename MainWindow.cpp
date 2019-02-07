@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    mThread->terminate();
     delete ui;
 }
 
@@ -81,12 +82,16 @@ void MainWindow::on_pushButton_buscar_clicked()
 
 void MainWindow::on_pushButton_salvar_clicked()
 {
+
     QDir dirIn;
     dirIn.cd(ui->lineEdit_dirIn->text());
     if(!dirIn.exists())
     {
         QMessageBox::information(this, tr("Processamento Rawdata"), tr("Escolha um diretório válido!"), QMessageBox::Ok);
+        return;
     }
+
+    carregarListaArquivos(dirIn);
 
     QString pathOut{QFileDialog::getExistingDirectory(this, tr("Diretório de Saída"))};
     if(pathOut.isEmpty())
@@ -96,8 +101,9 @@ void MainWindow::on_pushButton_salvar_clicked()
 
     Rawdata_Organizer rawdata(ui->checkBox_medValidas->isChecked(), this);
 
-    QThread* thread = new QThread(this);
-    rawdata.moveToThread(thread);
+    mThread = new QThread(this);
+    rawdata.moveToThread(mThread);
+    rawdata.deleteLater();
 
     connect(&rawdata, SIGNAL(progresso(int)), this, SLOT(updateProgressBar(int)));
     connect(&rawdata, SIGNAL(progressoFile(int)), this, SLOT(updateProgressoLista(int)));
@@ -115,12 +121,12 @@ void MainWindow::on_pushButton_salvar_clicked()
 
 void MainWindow::updateProgressBar(int value)
 {
-    QCoreApplication::processEvents();
     ui->progressBar->setValue(value);
 }
 
 void MainWindow::updateProgressoLista(int value)
 {
+    QCoreApplication::processEvents();
     if(value != 0)
         ui->tableWidget_listaArquivos->item(value - 1, 0)->setSelected(false);
 
