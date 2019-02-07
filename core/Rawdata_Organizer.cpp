@@ -1,15 +1,16 @@
 #include "Rawdata_Organizer.h"
 
-Rawdata_Organizer::Rawdata_Organizer(const bool &apenasValidas, const uint8_t &numThreads)
+Rawdata_Organizer::Rawdata_Organizer(const bool &apenasValidas, QObject *parent)
+    :QObject(parent)
 {
     this->mApenasValidas = apenasValidas;
-    this->mNumThreads = numThreads;
 }
 
 void Rawdata_Organizer::processar(const QDir &dirIn, const QDir &dirOut)
 {
 
     QStringList arqs{dirIn.entryList(QStringList{"*.csv"})};
+
     if(arqs.isEmpty())
     {
         this->mLog.add(Log::codigo::PASTA_VAZIA);
@@ -23,7 +24,21 @@ void Rawdata_Organizer::processar(const QDir &dirIn, const QDir &dirOut)
 
 }
 
-void Rawdata_Organizer::processarLista(const QStringList &arqs,const QDir& dirIn, const QDir &dirOut)
+void Rawdata_Organizer::processarLista(QStringList &arqs, const QDir& dirIn, const QDir &dirOut)
+{
+
+    size_t contador{0};
+    for(auto& fileName:arqs)
+    {
+        emit progressoFile(contador);
+        emit progresso(++contador*100/arqs.size());
+        processarArquivo(fileName, dirIn, dirOut);
+        arqs.pop_front();
+
+    }
+}
+
+void Rawdata_Organizer::processarArquivo(const QString &fileName, const QDir &dirIn, const QDir &dirOut)
 {
     QStringList strCsv;
     std::string str;
@@ -32,66 +47,57 @@ void Rawdata_Organizer::processarLista(const QStringList &arqs,const QDir& dirIn
 
     std::unique_ptr<Rawdata> layout;
 
-    for(auto& fileName:arqs)
+    arq.open(dirIn.absoluteFilePath(fileName).toStdString());
+    if(arq.is_open())
     {
-        arq.open(dirIn.absoluteFilePath(fileName).toStdString());
-        if(arq.is_open())
+        qDebug() << "Processando..." << fileName;
+        for(size_t i = 0; std::getline(arq,str); ++i)
         {
-            qDebug() << "Processando..." << fileName;
-            for(size_t i = 0; std::getline(arq,str); ++i)
+            strCsv = QString::fromStdString(str).split(";");
+
+            if(i==0)
             {
-                strCsv = QString::fromStdString(str).split(";");
-
-                if(i==0)
+                layout = tipoArquivo(str);
+                if(layout == nullptr)
                 {
-                    layout = tipoArquivo(str);
-                    if(layout == nullptr)
-                    {
-                        qDebug() << "Arquivo ignorado (fora do layout):" << fileName;
-                        this->mLog.add(Log::codigo::LAYOUT_INVALIDO, fileName);
-                        break;
-                    }
-                    cabecalho = strCsv;
-                    continue;
+                    qDebug() << "Arquivo ignorado (fora do layout):" << fileName;
+                    this->mLog.add(Log::codigo::LAYOUT_INVALIDO, fileName);
+                    break;
                 }
-
-                addMedicao(layout, strCsv, dirOut, fileName, cabecalho);
-
+                cabecalho = strCsv;
+                continue;
             }
-            arq.close();
-        }
-        else
-        {
-            qDebug() << "Erro ao ler:" << fileName;
-            this->mLog.add(Log::codigo::ERRO_LEITURA, fileName);
-        }
 
-        if(!mMapUfMedicoes.isEmpty())
-            descarregar(mMapUfMedicoes, dirOut, fileName, cabecalho);
+            addMedicao(layout, strCsv, dirOut, fileName, cabecalho);
 
+        }
+        arq.close();
     }
+    else
+    {
+        qDebug() << "Erro ao ler:" << fileName;
+        this->mLog.add(Log::codigo::ERRO_LEITURA, fileName);
+    }
+
+    if(!mMapUfMedicoes.isEmpty())
+        descarregar(mMapUfMedicoes, dirOut, fileName, cabecalho);
+
+
 }
 
 void Rawdata_Organizer::processarMultThread(const QDir &dirIn, const QDir &dirOut)
 {
-    mFilaProcessamento = dirIn.entryList(QStringList{"*.csv"});
 
+    QStringList arqs{dirIn.entryList(QStringList{"*.csv"})};
 
-    std::vector<std::unique_ptr<std::thread>> vecThreads;
-
-    std::uint8_t numThreads{0};
-
-    while(!mFilaProcessamento.isEmpty())
+    for(auto& fileName:arqs)
     {
-        if(numThreads <= this->mNumThreads)
-        {
-            vecThreads.push_back(std::unique_ptr<std::thread>(new std::thread(processarLista, this, QStringList{mFilaProcessamento.back()}, dirIn, dirOut)));
-            Thread_Guard guard{*vecThreads.back().get()};
-            mFilaProcessamento.pop_back();
-            ++numThreads;
-        }
+       QtConcurrent::run(this, &processarArquivo, QString(fileName), QDir(dirIn), QDir(dirOut));
 
+        if(arqs.isEmpty())
+            break;
     }
+
 }
 
 QDir Rawdata_Organizer::dirIn() const

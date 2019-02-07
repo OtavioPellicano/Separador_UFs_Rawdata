@@ -7,7 +7,7 @@
 #include "Scm_8.h"
 #include "Scm_9.h"
 #include "Smp_10_11.h"
-#include "Thread_Guard.h"
+//#include "Thread_Guard.h"
 #include "Log.h"
 
 #include <memory>
@@ -18,12 +18,17 @@
 #include <QDebug>
 #include <QHash>
 #include <set>
-#include <thread>
+#include <QtConcurrent>
+#include <qtconcurrentrun.h>
+#include <QThread>
+#include <QObject>
 
-class Rawdata_Organizer
+
+class Rawdata_Organizer: public QObject
 {
+    Q_OBJECT
 public:
-    Rawdata_Organizer(const bool& apenasValidas=false, const std::uint8_t& numThreads=4);
+    Rawdata_Organizer(const bool& apenasValidas=false, QObject* parent=0);
     virtual ~Rawdata_Organizer(){mMapUfMedicoes.clear();}
 
     void processar(const QDir& dirIn, const QDir& dirOut);
@@ -40,6 +45,10 @@ public:
 
     Log log() const;
 
+signals:
+    void progresso(int value);
+    void progressoFile(int value);
+
 private:
     template <class T>
     std::unique_ptr<Rawdata> tipoArquivo(const T& cabecalho);
@@ -48,15 +57,15 @@ private:
 
     void addMedicao(const std::unique_ptr<Rawdata> &layout, const QStringList& strCsv, const QDir& dirOut, const QString &fileName, const QStringList &cabecalho);
 
-    void processarLista(const QStringList& arqs, const QDir &dirIn, const QDir& dirOut);
+    void processarLista(QStringList &arqs, const QDir &dirIn, const QDir& dirOut);
+
+    void processarArquivo(const QString& fileName, const QDir& dirIn, const QDir& dirOut);
 
 private:
 
     QDir mDirIn, mDirOut;
 
     bool mApenasValidas{false};
-
-    std::uint8_t mNumThreads;
 
     QHash<QString, std::vector<QStringList>> mMapUfMedicoes;
 
@@ -67,6 +76,10 @@ private:
     std::uint8_t currentThreads{0};
 
     Log mLog;
+
+    QStringList mArqs;
+
+//    mutable QMutex mMutex;
 
 };
 

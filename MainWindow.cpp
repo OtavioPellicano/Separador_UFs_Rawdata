@@ -32,6 +32,7 @@ void MainWindow::carregarListaArquivos(const QDir &dirIn)
     {
         ui->tableWidget_listaArquivos->setItem(i, 0, new QTableWidgetItem(it[0]));
     }
+
 }
 
 void MainWindow::carregarTabelaLog(const QStringList &cabecalho, const std::vector<QStringList> &vecLog)
@@ -89,22 +90,30 @@ void MainWindow::on_pushButton_salvar_clicked()
 
     QDir dirOut{pathOut};
 
-    QMessageBox msg(this);
-    msg.setWindowTitle(tr("Processamento Rawdata"));
-    msg.setText("Separando UFs...");
-    msg.setStandardButtons(0);  //removendo todos os botões
-    msg.show();
-    QTest::qWait(5);    //Esperando a janela abrir
+    Rawdata_Organizer rawdata(ui->checkBox_medValidas->isChecked(), this);
 
-    Rawdata_Organizer rawdata(ui->checkBox_medValidas->isChecked());
+    QThread* thread = new QThread(this);
+    rawdata.moveToThread(thread);
+
+    connect(&rawdata, SIGNAL(progresso(int)), this, SLOT(updateProgressBar(int)));
+
+    ui->statusBar->showMessage("Processando...");
     rawdata.processar(dirIn, dirOut);
-
-    msg.close();
-    msg.setText("Processamento Concluído!");
-    msg.setStandardButtons(QMessageBox::Ok);
 
     carregarTabelaLog(rawdata.log().cabecalho(), rawdata.log().logs());
 
-    msg.exec();
+    updateProgressBar(100);
 
+    ui->statusBar->showMessage("Processamento Concluído!");
+
+}
+
+void MainWindow::updateProgressBar(int value)
+{
+    ui->progressBar->setValue(value);
+}
+
+void MainWindow::updateProgressoLista(int value)
+{
+    ui->tableWidget_listaArquivos->item(value,0)->setSelected(true);
 }

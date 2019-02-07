@@ -7,6 +7,8 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QTest>
+//#include <QtConcurrent>
+#include <QThread>
 #include "core/Rawdata_Organizer.h"
 
 namespace Ui {
@@ -30,6 +32,10 @@ private slots:
     void on_pushButton_buscar_clicked();
 
     void on_pushButton_salvar_clicked();
+
+    void updateProgressBar(int value);
+
+    void updateProgressoLista(int value);
 
 private:
     Ui::MainWindow *ui;
