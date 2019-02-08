@@ -108,7 +108,7 @@ void MainWindow::on_pushButton_salvar_clicked()
 
     QDir dirOut{pathOut};
 
-    mRawdata = new Rawdata_Organizer(ui->checkBox_medValidas->isChecked(), this);
+    mRawdata = new Rawdata_Organizer(ui->checkBox_medValidas->isChecked());
     mRawdata->deleteLater();
 
     mThread = new QThread(this);
