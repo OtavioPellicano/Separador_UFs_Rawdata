@@ -30,9 +30,9 @@ void Rawdata_Organizer::processarLista(QStringList &arqs, const QDir& dirIn, con
     size_t contador{0};
     for(auto& fileName:arqs)
     {
-        emit progressoFile(contador);
         processarArquivo(fileName, dirIn, dirOut);
         emit progresso(++contador*100/arqs.size());
+        emit progressoFile(contador);
     }
 }
 
@@ -110,6 +110,7 @@ void Rawdata_Organizer::descarregar(QHash<QString, std::vector<QStringList> > &m
         descarregar(itMap.value(), dirOut, itMap.key() + "_" + fileName, cabecalho);
     }
     mapUfMedicoes.clear();
+    this->mQntMed = 0;
 }
 
 void Rawdata_Organizer::descarregar(std::vector<QStringList> &vecMedicoes, const QDir &dirOut, const QString &fileName, const QStringList& cabecalho)
@@ -157,7 +158,7 @@ void Rawdata_Organizer::addMedicao(const std::unique_ptr<Rawdata>& layout, const
             QString ufTemp{layout.get()->uf(strCsv)};
             this->mMapUfMedicoes[ufTemp].push_back(strCsv);
 
-            if(this->mMapUfMedicoes[ufTemp].size() > this->MAX_MED)
+            if(this->mQntMed > this->MAX_MED)
                 descarregar(this->mMapUfMedicoes, dirOut, fileName, cabecalho);
         }
     }
@@ -166,10 +167,11 @@ void Rawdata_Organizer::addMedicao(const std::unique_ptr<Rawdata>& layout, const
         QString ufTemp{layout.get()->uf(strCsv)};
         this->mMapUfMedicoes[ufTemp].push_back(strCsv);
 
-        if(this->mMapUfMedicoes[ufTemp].size() > this->MAX_MED)
+        if(this->mQntMed > this->MAX_MED)
             descarregar(this->mMapUfMedicoes, dirOut, fileName, cabecalho);
     }
 
+    ++this->mQntMed;
 }
 
 Log Rawdata_Organizer::log() const

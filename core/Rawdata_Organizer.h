@@ -65,7 +65,7 @@ private:
 
     QHash<QString, std::vector<QStringList>> mMapUfMedicoes;
 
-    const std::uint16_t MAX_MED = static_cast<std::uint16_t>(1E5);
+    const std::uint32_t MAX_MED = static_cast<std::uint32_t>(8E5);
 
     QStringList mFilaProcessamento;
 
@@ -75,7 +75,8 @@ private:
 
     QStringList mArqs;
 
-//    mutable QMutex mMutex;
+    std::uint32_t mQntMed{0};
+
 
 };
 
