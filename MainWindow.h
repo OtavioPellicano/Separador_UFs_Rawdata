@@ -41,6 +41,8 @@ private:
     Ui::MainWindow *ui;
 
     QThread* mThread;
+
+    Rawdata_Organizer* mRawdata;
 };
 
 #endif // MAINWINDOW_H

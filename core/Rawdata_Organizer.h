@@ -44,6 +44,7 @@ signals:
     void progresso(int value);
     void progressoFile(int value);
 
+
 private:
     template <class T>
     std::unique_ptr<Rawdata> tipoArquivo(const T& cabecalho);

@@ -15,7 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    mThread->terminate();
     delete ui;
 }
 
@@ -93,25 +92,28 @@ void MainWindow::on_pushButton_salvar_clicked()
 
     carregarListaArquivos(dirIn);
 
+    QMessageBox::warning(this, tr("Processamento Rawdata"), tr("Após iniciado, o processamento não pode ser cancelado!"));
+
     QString pathOut{QFileDialog::getExistingDirectory(this, tr("Diretório de Saída"))};
     if(pathOut.isEmpty())
         return;
 
     QDir dirOut{pathOut};
 
-    Rawdata_Organizer rawdata(ui->checkBox_medValidas->isChecked(), this);
+    mRawdata = new Rawdata_Organizer(ui->checkBox_medValidas->isChecked());
+    mRawdata->deleteLater();
 
     mThread = new QThread(this);
-    rawdata.moveToThread(mThread);
-    rawdata.deleteLater();
+    mThread->deleteLater();
+    mRawdata->moveToThread(mThread);
 
-    connect(&rawdata, SIGNAL(progresso(int)), this, SLOT(updateProgressBar(int)));
-    connect(&rawdata, SIGNAL(progressoFile(int)), this, SLOT(updateProgressoLista(int)));
+    connect(mRawdata, SIGNAL(progresso(int)), this, SLOT(updateProgressBar(int)));
+    connect(mRawdata, SIGNAL(progressoFile(int)), this, SLOT(updateProgressoLista(int)));
 
     ui->statusBar->showMessage("Processando...");
-    rawdata.processar(dirIn, dirOut);
+    mRawdata->processar(dirIn, dirOut);
 
-    carregarTabelaLog(rawdata.log().cabecalho(), rawdata.log().logs());
+    carregarTabelaLog(mRawdata->log().cabecalho(), mRawdata->log().logs());
 
     updateProgressBar(100);
 
@@ -133,3 +135,4 @@ void MainWindow::updateProgressoLista(int value)
     ui->tableWidget_listaArquivos->item(value, 0)->setSelected(true);
     ui->tableWidget_listaArquivos->verticalScrollBar()->setValue(value);
 }
+
