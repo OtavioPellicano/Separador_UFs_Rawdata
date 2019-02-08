@@ -20,20 +20,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::carregarListaArquivos(const QDir &dirIn)
 {
+
     ui->tableWidget_listaArquivos->setColumnCount(1);
     ui->tableWidget_listaArquivos->setHorizontalHeaderLabels(QStringList{"Arquivos .csv no diretório"});
     ui->tableWidget_listaArquivos->horizontalHeader()->setStretchLastSection(true);
     ui->tableWidget_listaArquivos->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     QStringList arqs{dirIn.entryList(QStringList{"*.csv"})};
-    ui->tableWidget_listaArquivos->setRowCount(arqs.size());
+
     ui->tableWidget_listaArquivos->clearContents();
 
     size_t i{0};
-    for(auto it = arqs.begin(); it != arqs.end();++ it, ++i)
+    for(auto it = arqs.begin(); it != arqs.end();++it, ++i)
     {
-        ui->tableWidget_listaArquivos->setItem(i, 0, new QTableWidgetItem(it[0]));
-    }
+        ui->tableWidget_listaArquivos->setRowCount(i+1);
+        if(i < mMAXIMO_ITENS_LISTA)
+            ui->tableWidget_listaArquivos->setItem(i, 0, new QTableWidgetItem(it[0]));
+        else
+        {
+            ui->tableWidget_listaArquivos->setItem(i, 0, new QTableWidgetItem("..."));
+            break;
+        }
+     }
 
     updateProgressBar(0);
     ui->statusBar->clearMessage();
@@ -123,12 +131,15 @@ void MainWindow::on_pushButton_salvar_clicked()
 
 void MainWindow::updateProgressBar(int value)
 {
+    QCoreApplication::processEvents();
     ui->progressBar->setValue(value);
 }
 
 void MainWindow::updateProgressoLista(int value)
 {
-    QCoreApplication::processEvents();
+    if(value >= ui->tableWidget_listaArquivos->rowCount())
+        return;
+
     if(value != 0)
         ui->tableWidget_listaArquivos->item(value - 1, 0)->setSelected(false);
 

@@ -43,6 +43,8 @@ private:
     QThread* mThread;
 
     Rawdata_Organizer* mRawdata;
+
+    const std::uint8_t mMAXIMO_ITENS_LISTA{100};
 };
 
 #endif // MAINWINDOW_H
