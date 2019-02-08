@@ -30,9 +30,9 @@ void Rawdata_Organizer::processarLista(QStringList &arqs, const QDir& dirIn, con
     size_t contador{0};
     for(auto& fileName:arqs)
     {
+        emit progressoFile(contador);
         processarArquivo(fileName, dirIn, dirOut);
         emit progresso(++contador*100/arqs.size());
-        emit progressoFile(contador);
     }
 }
 

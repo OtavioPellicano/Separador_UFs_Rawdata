@@ -145,5 +145,6 @@ void MainWindow::updateProgressoLista(int value)
 
     ui->tableWidget_listaArquivos->item(value, 0)->setSelected(true);
     ui->tableWidget_listaArquivos->verticalScrollBar()->setValue(value);
+    QCoreApplication::processEvents();
 }
 
